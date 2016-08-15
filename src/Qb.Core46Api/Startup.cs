@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -27,7 +28,6 @@ namespace Qb.Core46Api
         // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
 
             services.AddMvc();
@@ -40,10 +40,24 @@ namespace Qb.Core46Api
             loggerFactory.AddDebug();
 
             app.UseApplicationInsightsRequestTelemetry();
-
             app.UseApplicationInsightsExceptionTelemetry();
 
+            if (env.IsDevelopment())
+                app.UseDeveloperExceptionPage();
+            else
+                app.UseExceptionHandler("/error.html");
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseMvc();
+
+            // Simple universal 404.
+            app.Run(async context =>
+            {
+                context.Response.ContentType = "text/html"; //Edge becomes unprefictable if you dont set this.
+                context.Response.StatusCode = 404;
+                await context.Response.WriteAsync("\uFEFF404"); //First character is BOM for UTF-8. 
+            });
         }
     }
 }
