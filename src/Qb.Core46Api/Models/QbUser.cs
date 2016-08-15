@@ -2,7 +2,7 @@
 
 namespace Qb.Core46Api.Models
 {
-    public class QbDbUser : OpenIddictUser
+    public class QbUser : OpenIddictUser
     {
     }
 }
