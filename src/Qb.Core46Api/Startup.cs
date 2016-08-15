@@ -43,7 +43,10 @@ namespace Qb.Core46Api
             app.UseApplicationInsightsExceptionTelemetry();
 
             if (env.IsDevelopment())
+            {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
+            }
             else
                 app.UseExceptionHandler("/error.html");
 
