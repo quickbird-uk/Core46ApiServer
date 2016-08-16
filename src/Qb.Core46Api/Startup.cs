@@ -1,16 +1,16 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Qb.Core46Api.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Qb.Core46Api
 {
@@ -54,10 +54,13 @@ namespace Qb.Core46Api
                 .SetAccessTokenLifetime(TimeSpan.FromDays(365));
 
             services.AddMvc();
+
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IServiceScopeFactory scopeFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,
+            IServiceScopeFactory scopeFactory)
         {
             // Create a closed DI scope to run initial configuration.
             using (var scope = scopeFactory.CreateScope())
@@ -65,7 +68,7 @@ namespace Qb.Core46Api
                 ConfigureDbAdminAndRoles(scope).Wait();
             }
 
-                loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
             app.UseApplicationInsightsRequestTelemetry();
@@ -82,6 +85,9 @@ namespace Qb.Core46Api
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseMvc();
+
+            app.UseSwagger();
+            app.UseSwaggerUi();
 
             // Simple universal 404.
             app.Run(async context =>
@@ -114,14 +120,12 @@ namespace Qb.Core46Api
 
             var roleMan = scope.ServiceProvider.GetService<RoleManager<IdentityRole>>();
             if (!roleMan.Roles.Any(r => r.Name == "admin"))
-            {
                 await roleMan.CreateAsync(new IdentityRole("admin"));
-            }
 
             var userManager = scope.ServiceProvider.GetService<UserManager<QbUser>>();
             if (await userManager.FindByNameAsync("admin") == null)
             {
-                var adminUser = new QbUser { UserName = "admin", PhoneNumberConfirmed = true };
+                var adminUser = new QbUser {UserName = "admin", PhoneNumberConfirmed = true};
                 await userManager.CreateAsync(adminUser, "xxxxxxxx");
                 adminUser = await userManager.FindByNameAsync("admin");
                 await userManager.AddToRoleAsync(adminUser, "admin");
