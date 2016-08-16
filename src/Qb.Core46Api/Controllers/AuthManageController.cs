@@ -22,8 +22,7 @@ namespace Qb.Core46Api.Controllers
         /// <summary>Gets calims from current authorization (property of the token/signin, not a property of the the user).</summary>
         /// <returns>List of | separated calims.</returns>
         [Authorize]
-        [HttpGet]
-        [Route("[action]")]
+        [HttpGet("[action]")]
         public IActionResult MyClaims()
         {
             var claims = User.Claims.Select(c => $"Subject:{c.Subject}, Type:{c.Type}, Value:{c.Value}");
@@ -33,8 +32,7 @@ namespace Qb.Core46Api.Controllers
 
         /// <summary>Admin is the god role, never give to users.</summary>
         [Authorize(Roles = "admin")]
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> GrantAdminRole(string username)
         {
             var user = await _userManager.FindByNameAsync(username);
@@ -48,8 +46,7 @@ namespace Qb.Core46Api.Controllers
 
         /// <summary>Sets phone number for a user skipping text authorization.</summary>
         [Authorize(Roles = "admin")]
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> SetPhonenumberAndConfirm(string username, string phonenumber)
         {
             var user = await _userManager.FindByNameAsync(username);
@@ -66,8 +63,7 @@ namespace Qb.Core46Api.Controllers
 
         /// <summary>Test authorization for any user (404 on fail).</summary>
         [Authorize]
-        [HttpGet]
-        [Route("[action]")]
+        [HttpGet("[action]")]
         public IActionResult AmIAuthorized()
         {
             return Res.PlainUtf8("true");
@@ -76,8 +72,7 @@ namespace Qb.Core46Api.Controllers
         /// <summary>Test if admin role authorization is granted (404 on fail).</summary>
         /// <returns></returns>
         [Authorize(Roles = "admin")]
-        [HttpGet]
-        [Route("[action]")]
+        [HttpGet("[action]")]
         public IActionResult AmIAuthorizedAdmin()
         {
             return Res.PlainUtf8("true");
@@ -85,9 +80,8 @@ namespace Qb.Core46Api.Controllers
 
 
         /// <summary>Gets a phone auth token - for testing.</summary>
-        [Authorize(Roles = "admin")]
-        [HttpPost]
-        [Route("[action]")]
+        //[Authorize(Roles = "admin")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> GetPhoneTokenDirect(string username, string phonenumber)
         {
             var pars = new[] {username, phonenumber};
@@ -106,8 +100,7 @@ namespace Qb.Core46Api.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> DeleteUser(string username)
         {
             if (string.IsNullOrEmpty(username))

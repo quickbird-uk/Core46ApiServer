@@ -37,6 +37,8 @@ namespace Qb.Core46Api
         {
             services.AddApplicationInsightsTelemetry(Configuration);
 
+            services.AddMvc();
+
             // Add the database context, defaults to scoped; new context for each request.
             services.AddDbContext<QbDbContext>(
                 options => { options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")); });
@@ -52,8 +54,6 @@ namespace Qb.Core46Api
                 .DisableHttpsRequirement() // TODO: Must unset this in production and staging
                 .AddEphemeralSigningKey() // TODO: Must unset this in production and staging
                 .SetAccessTokenLifetime(TimeSpan.FromDays(365));
-
-            services.AddMvc();
 
             services.AddSwaggerGen();
         }
@@ -81,6 +81,10 @@ namespace Qb.Core46Api
             }
             else
                 app.UseExceptionHandler("/error.html");
+
+            app.UseIdentity(); // Authorization using ASP Identity.
+            app.UseOAuthValidation();
+            app.UseOpenIddict(); // OpenIddict takes care of the token issuing.
 
             app.UseDefaultFiles();
             app.UseStaticFiles();

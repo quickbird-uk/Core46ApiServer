@@ -8,7 +8,7 @@ using Qb.Core46Api.Models;
 namespace Qb.Core46Api.Migrations
 {
     [DbContext(typeof(QbDbContext))]
-    [Migration("20160815180450_initial")]
+    [Migration("20160816142118_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
