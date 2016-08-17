@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Qb.Core46Api.Helpers;
 using Qb.Core46Api.Models;
+using Qb.Core46Api.Services;
 
 namespace Qb.Core46Api.Controllers
 {
@@ -21,7 +22,8 @@ namespace Qb.Core46Api.Controllers
         /// <summary>Register new user using phone confirmation.</summary>
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Register(string username, string password, string phonenumber)
+        public async Task<IActionResult> Register(string username, string password, string phonenumber,
+            [FromServices] ISmsSender smsSender)
         {
             var pars = new[] {username, password, phonenumber};
             if (pars.Any(string.IsNullOrWhiteSpace))
@@ -43,9 +45,10 @@ namespace Qb.Core46Api.Controllers
 
                 // Ignore used for manual admin verified user.
                 if (phonenumber.ToLowerInvariant() != "ignore")
-                {
-                    //TODO: Implement SMS of token here.
-                }
+                    if (!await smsSender.SendSms($"QB sign-up code:{phoneToken}", phonenumber))
+                        return
+                            Res.PlainUtf8(
+                                "User created but sms failed, try re-requesting code by changing phonenumber.", 400);
 
                 return Res.PlainUtf8($"User {username} successfully created, needs verification.");
             }
@@ -57,7 +60,8 @@ namespace Qb.Core46Api.Controllers
         /// <summary>Change phone number with text confirmation. Also use to re-send code.</summary>
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> ChangePhoneNumber(string username, string password, string phonenumber)
+        public async Task<IActionResult> ChangePhoneNumber(string username, string password, string phonenumber,
+            [FromServices] ISmsSender smsSender)
         {
             var pars = new[] {username, phonenumber, password};
             if (pars.Any(string.IsNullOrWhiteSpace))
@@ -75,8 +79,9 @@ namespace Qb.Core46Api.Controllers
                 return Res.PlainUtf8("Invalid password", 400);
 
             var phoneToken = await _userManager.GenerateChangePhoneNumberTokenAsync(user, phonenumber);
-            //TODO: Text token instead of sending it.
-            return Res.PlainUtf8($"New phone code for {username}: {phoneToken}.");
+            if (!await smsSender.SendSms($"QB sign-up code:{phoneToken}", phonenumber))
+                return Res.PlainUtf8("User created but sms failed, try re-requesting code by changing phonenumber.", 400);
+            return Res.PlainUtf8($"New phone code texted for {username}.");
         }
 
         [HttpPost]
