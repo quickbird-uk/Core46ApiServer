@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Qb.Core46Api.Models;
 using Qb.Core46Api.Services;
 
@@ -17,6 +19,8 @@ namespace Qb.Core46Api
 {
     public class Startup
     {
+        private readonly bool _dev;
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -25,7 +29,11 @@ namespace Qb.Core46Api
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true);
 
             if (env.IsEnvironment("Development"))
+            {
+                _dev = true;
+                _dev = true;
                 builder.AddApplicationInsightsSettings(true);
+            }
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
@@ -49,12 +57,14 @@ namespace Qb.Core46Api
                 .AddEntityFrameworkStores<QbDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddOpenIddict<QbUser, QbDbContext>()
+            var openIddict = services.AddOpenIddict<QbUser, QbDbContext>()
                 .EnableTokenEndpoint("/api/auth/token") // Password grant route
                 .AllowPasswordFlow() // Enables password grant
-                .DisableHttpsRequirement() // TODO: Must unset this in production and staging
-                .AddEphemeralSigningKey() // TODO: Must unset this in production and staging
+                .AddSigningKey(new SymmetricSecurityKey(Encoding.ASCII.GetBytes("A rather basic key")))
                 .SetAccessTokenLifetime(TimeSpan.FromDays(365));
+
+            if (_dev)
+                openIddict.DisableHttpsRequirement();
 
             services.AddSwaggerGen();
 
