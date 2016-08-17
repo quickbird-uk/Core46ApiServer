@@ -18,7 +18,8 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "OpenIddict": "1.0.0-alpha2-0410",
-    "Swashbuckle": "6.0.0-beta902"
+    "Swashbuckle": "6.0.0-beta902",
+    "Twilio": "5.0.0-rc4"
   },
 
   "tools": {
