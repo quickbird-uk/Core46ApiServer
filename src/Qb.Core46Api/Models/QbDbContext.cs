@@ -13,7 +13,7 @@ namespace Qb.Core46Api.Models
         public QbDbContext(DbContextOptions options) : base(options)
         {
         }
-        
+
         public DbSet<Parameter> Parameters { get; set; }
         public DbSet<Placement> Placements { get; set; }
         public DbSet<SensorType> SensorTypes { get; set; }
@@ -23,18 +23,15 @@ namespace Qb.Core46Api.Models
         public DbSet<Location> Location { get; set; }
         public DbSet<CropCycle> CropCycles { get; set; }
         public DbSet<CropType> CropTypes { get; set; }
-        public DbSet<RelayHistory> RelayHistories { get; set; }
         public DbSet<SensorHistory> SensorHistories { get; set; }
 
         public DbSet<Device> Devices { get; set; }
-        public DbSet<Relay> Relays { get; set; }
         public DbSet<Sensor> Sensors { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<RelayHistory>().HasKey(rh => new {rh.RelayID, rh.TimeStamp});
             builder.Entity<SensorHistory>().HasKey(sd => new {sd.SensorID, sd.TimeStamp});
 
             builder.Entity<Location>().Property(gh => gh.Person).IsRequired();
@@ -46,9 +43,6 @@ namespace Qb.Core46Api.Models
 
             builder.Entity<Person>().HasKey(p => p.ID);
             builder.Entity<Person>().Property(p => p.ID).ValueGeneratedNever();
-
-            builder.Entity<Sensor>().Property(sn => sn.AlertHigh).IsRequired(false);
-            builder.Entity<Sensor>().Property(sn => sn.AlertLow).IsRequired(false);
 
             builder.Entity<Location>()
                 .HasMany(gh => gh.SensorHistory)
@@ -65,8 +59,8 @@ namespace Qb.Core46Api.Models
                 .WithOne(cc => cc.CropType)
                 .HasForeignKey(cc => cc.CropTypeName);
 
-            builder.Entity<SensorHistory>().Ignore(sh => sh.Data);
             builder.Entity<SensorHistory>().HasIndex(sh => sh.UploadedAt);
+
         }
     }
 }

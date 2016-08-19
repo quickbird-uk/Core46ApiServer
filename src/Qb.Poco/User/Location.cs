@@ -9,21 +9,23 @@ namespace Qb.Poco.User
     {
         public string Name { get; set; }
 
+        /// <remarks>fk</remarks>
+        public Guid PersonId { get; set; }
+
+        /// <remarks>fk-nav</remarks>
         [JsonIgnore]
         public virtual Person Person { get; set; }
 
-        public Guid PersonId { get; set; }
-
+        /// <remarks>nav</remarks>
         [JsonIgnore]
         public virtual List<Device> Devices { get; set; }
 
+        /// <remarks>nav</remarks>
         [JsonIgnore]
         public virtual List<CropCycle> CropCycles { get; set; }
 
+        /// <remarks>nav</remarks>
         [JsonIgnore]
         public virtual List<SensorHistory> SensorHistory { get; set; }
-
-        [JsonIgnore]
-        public virtual List<RelayHistory> RelayHistory { get; set; }
     }
 }

@@ -11,11 +11,14 @@ namespace Qb.Poco.Hardware
 
         public Guid SerialNumber { get; set; }
 
+        /// <remarks>fk-nav</remarks>
         [JsonIgnore]
         public virtual Location Location { get; set; }
 
+        /// <remarks>fk</remarks>
         public Guid LocationID { get; set; }
 
+        /// <remarks>nav</remarks>
         [JsonIgnore]
         public virtual List<Sensor> Sensors { get; set; }
     }

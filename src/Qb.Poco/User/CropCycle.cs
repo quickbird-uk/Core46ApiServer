@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Qb.Poco.Global;
 
 namespace Qb.Poco.User
@@ -9,18 +10,22 @@ namespace Qb.Poco.User
 
         public double Yield { get; set; } = 0;
 
-        public string CropVariety { get; set; } = "Unknown";
-
         public DateTimeOffset StartDate { get; set; }
 
         public DateTimeOffset? EndDate { get; set; }
 
-        public virtual CropType CropType { get; set; }
-
+        /// <remarks>fk</remarks>
         public string CropTypeName { get; set; }
 
-        public virtual Location Location { get; set; }
-
+        /// <remarks>fk</remarks>
         public Guid LocationID { get; set; }
+
+        /// <remarks>fk-nav</remarks>
+        [JsonIgnore]
+        public virtual CropType CropType { get; set; }
+
+        /// <remarks>fk-nav</remarks>
+        [JsonIgnore]
+        public virtual Location Location { get; set; }
     }
 }

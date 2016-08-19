@@ -13,9 +13,6 @@ namespace Qb.Poco.User
         /// <summary>used for soft-delete. As a rule of thumb, don't display these items in UI</summary>
         public bool Deleted { get; set; } = false;
 
-        /// <summary>used to detect conflicts. To be implemented</summary>
-        public byte[] Version { get; set; }
-
         public Guid ID { get; set; }
     }
 }

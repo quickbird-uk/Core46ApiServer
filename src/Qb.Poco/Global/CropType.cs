@@ -11,10 +11,7 @@ namespace Qb.Poco.Global
 
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
 
-        public bool Approved { get; set; } = false;
-
-        public Guid? CreatedBy { get; set; } = null;
-
+        /// <remarks>nav</remarks>
         [JsonIgnore]
         public virtual List<CropCycle> CropCycles { get; set; }
     }

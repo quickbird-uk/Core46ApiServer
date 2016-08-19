@@ -7,16 +7,13 @@ namespace Qb.Poco
 {
     public class Person : IHasGuid
     {
-        public ulong twitterID { get; set; }
-
-        public string TwitterHandle { get; set; }
-
         public string UserName { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
 
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.Now;
 
+        /// <remarks>nav</remarks>
         [JsonIgnore]
         public virtual List<Location> Locations { get; set; }
 
