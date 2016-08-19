@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using Qb.Poco.Hardware;
 
 namespace Qb.Poco.Global
 {

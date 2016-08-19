@@ -8,9 +8,6 @@ namespace Qb.Poco.Global
         public string Name { get; set; }
 
         [JsonIgnore]
-        public virtual List<RelayType> ControlTypes { get; set; }
-
-        [JsonIgnore]
         public virtual List<SensorType> SensorTypes { get; set; }
 
         public long ID { get; set; }
