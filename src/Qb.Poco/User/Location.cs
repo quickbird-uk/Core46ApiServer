@@ -26,6 +26,6 @@ namespace Qb.Poco.User
 
         /// <remarks>nav</remarks>
         [JsonIgnore]
-        public virtual List<SensorHistory> SensorHistory { get; set; }
+        public virtual List<SensorHistory> SensorHistories { get; set; }
     }
 }

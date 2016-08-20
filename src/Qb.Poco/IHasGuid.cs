@@ -4,6 +4,6 @@ namespace Qb.Poco
 {
     public interface IHasGuid
     {
-        Guid ID { get; }
+        Guid Id { get; }
     }
 }

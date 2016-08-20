@@ -15,17 +15,17 @@ namespace Qb.Poco.Hardware
         public virtual SensorType SensorType { get; set; }
 
         /// <remarks>fk</remarks>
-        public long SensorTypeID { get; set; }
+        public long SensorTypeId { get; set; }
 
         /// <remarks>fk-nav</remarks>
         [JsonIgnore]
         public virtual Device Device { get; set; }
 
         /// <remarks>fk</remarks>
-        public Guid DeviceID { get; set; }
+        public Guid DeviceId { get; set; }
 
         /// <remarks>nav</remarks>
         [JsonIgnore]
-        public virtual List<SensorHistory> SensorHistory { get; set; }
+        public virtual List<SensorHistory> SensorHistories { get; set; }
     }
 }

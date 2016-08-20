@@ -13,6 +13,6 @@ namespace Qb.Poco.Global
         /// <remarks>nav</remarks>
         public virtual List<SensorType> SensorTypes { get; set; }
 
-        public long ID { get; set; }
+        public long Id { get; set; }
     }
 }

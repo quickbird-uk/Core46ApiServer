@@ -7,7 +7,8 @@ namespace Qb.Poco
 {
     public class Person : IHasGuid
     {
-        public string UserName { get; set; }
+        /// <summary>The Id of the linked Identity (soft linked for flexibility).</summary>
+        public string IdentityId { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
 
@@ -17,6 +18,6 @@ namespace Qb.Poco
         [JsonIgnore]
         public virtual List<Location> Locations { get; set; }
 
-        public Guid ID { get; set; }
+        public Guid Id { get; set; }
     }
 }

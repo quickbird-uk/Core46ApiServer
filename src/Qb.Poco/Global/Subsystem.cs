@@ -7,9 +7,10 @@ namespace Qb.Poco.Global
     {
         public string Name { get; set; }
 
+        /// <remarks>nav</remarks>
         [JsonIgnore]
         public virtual List<SensorType> SensorTypes { get; set; }
 
-        public long ID { get; set; }
+        public long Id { get; set; }
     }
 }

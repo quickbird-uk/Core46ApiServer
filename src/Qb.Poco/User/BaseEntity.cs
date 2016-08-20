@@ -10,9 +10,10 @@ namespace Qb.Poco.User
         /// <summary>Should be updated every time a value is locally changed.</summary>
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.Now;
 
-        /// <summary>used for soft-delete. As a rule of thumb, don't display these items in UI</summary>
+        /// <summary>For soft deleteion without breaking old relationships. Usually hidden from users.</summary>
         public bool Deleted { get; set; } = false;
 
-        public Guid ID { get; set; }
+        /// <summary>pk</summary>
+        public Guid Id { get; set; }
     }
 }

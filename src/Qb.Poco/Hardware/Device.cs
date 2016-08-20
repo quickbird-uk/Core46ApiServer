@@ -16,7 +16,7 @@ namespace Qb.Poco.Hardware
         public virtual Location Location { get; set; }
 
         /// <remarks>fk</remarks>
-        public Guid LocationID { get; set; }
+        public Guid LocationId { get; set; }
 
         /// <remarks>nav</remarks>
         [JsonIgnore]

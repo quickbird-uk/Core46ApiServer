@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
-using Qb.Poco.Hardware;
 
 namespace Qb.Poco.Global
 {
@@ -12,6 +11,6 @@ namespace Qb.Poco.Global
         [JsonIgnore]
         public virtual List<SensorType> SensorTypes { get; set; }
 
-        public long ID { get; set; }
+        public long Id { get; set; }
     }
 }

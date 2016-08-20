@@ -16,23 +16,37 @@ namespace Qb.Core46Api.Models
 
         public DbSet<Parameter> Parameters { get; set; }
         public DbSet<Placement> Placements { get; set; }
-        public DbSet<SensorType> SensorTypes { get; set; }
         public DbSet<Subsystem> Subsystems { get; set; }
+        public DbSet<CropType> CropTypes { get; set; }
+
+        /// <summary>Depends on Parameters, Placements and Subsystems.</summary>
+        public DbSet<SensorType> SensorTypes { get; set; }
+
 
         public DbSet<Person> People { get; set; }
-        public DbSet<Location> Location { get; set; }
+
+        /// <summary>Depends on People.</summary>
+        public DbSet<Location> Locations { get; set; }
+
+        /// <summary>Depends on Locations.</summary>
         public DbSet<CropCycle> CropCycles { get; set; }
-        public DbSet<CropType> CropTypes { get; set; }
+
+        /// <summary>Depends on Locations.</summary>
+        public DbSet<Device> Devices { get; set; }
+
+        /// <summary>Depends on Devices and SensorTypes.</summary>
+        public DbSet<Sensor> Sensors { get; set; }
+
+        /// <summary>Depends on Locations and Sensors.</summary>
         public DbSet<SensorHistory> SensorHistories { get; set; }
 
-        public DbSet<Device> Devices { get; set; }
-        public DbSet<Sensor> Sensors { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
+            builder.Entity<Person>().HasKey(p => p.Id);
+            builder.Entity<Person>().Property(p => p.Id).ValueGeneratedNever();
 
-            builder.Entity<SensorHistory>().HasKey(sd => new {sd.SensorID, sd.TimeStamp});
+            builder.Entity<SensorHistory>().HasKey(sd => new {sd.SensorId, sd.TimeStamp});
 
             builder.Entity<Location>().Property(gh => gh.Person).IsRequired();
             builder.Entity<Location>()
@@ -41,11 +55,9 @@ namespace Qb.Core46Api.Models
                 .HasForeignKey(gh => gh.PersonId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            builder.Entity<Person>().HasKey(p => p.ID);
-            builder.Entity<Person>().Property(p => p.ID).ValueGeneratedNever();
 
             builder.Entity<Location>()
-                .HasMany(gh => gh.SensorHistory)
+                .HasMany(gh => gh.SensorHistories)
                 .WithOne(sd => sd.Location)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
@@ -61,6 +73,7 @@ namespace Qb.Core46Api.Models
 
             builder.Entity<SensorHistory>().HasIndex(sh => sh.UploadedAt);
 
+            base.OnModelCreating(builder);
         }
     }
 }

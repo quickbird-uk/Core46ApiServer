@@ -9,22 +9,22 @@ namespace Qb.Poco.Global
         public virtual Subsystem Subsystem { get; set; }
 
         /// <remarks>fk</remarks>
-        public long SubsystemID { get; set; }
+        public long SubsystemId { get; set; }
 
         /// <remarks>fk-nav</remarks>
         [JsonIgnore]
-        public virtual Placement Place { get; set; }
+        public virtual Placement Placement { get; set; }
 
         /// <remarks>fk</remarks>
-        public long PlaceID { get; set; }
+        public long PlacementId { get; set; }
 
         /// <remarks>fk-nav</remarks>
         [JsonIgnore]
-        public virtual Parameter Param { get; set; }
+        public virtual Parameter Parameter { get; set; }
 
         /// <remarks>fk</remarks>
-        public long ParamID { get; set; }
+        public long ParameterId { get; set; }
 
-        public long ID { get; set; }
+        public long Id { get; set; }
     }
 }

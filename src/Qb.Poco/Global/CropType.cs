@@ -7,6 +7,7 @@ namespace Qb.Poco.Global
 {
     public class CropType
     {
+        /// <remarks>pk</remarks>
         public string Name { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;

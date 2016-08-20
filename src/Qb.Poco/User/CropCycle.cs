@@ -18,7 +18,7 @@ namespace Qb.Poco.User
         public string CropTypeName { get; set; }
 
         /// <remarks>fk</remarks>
-        public Guid LocationID { get; set; }
+        public Guid LocationId { get; set; }
 
         /// <remarks>fk-nav</remarks>
         [JsonIgnore]
