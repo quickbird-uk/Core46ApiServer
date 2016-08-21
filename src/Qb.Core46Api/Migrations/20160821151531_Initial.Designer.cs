@@ -8,7 +8,7 @@ using Qb.Core46Api.Models;
 namespace Qb.Core46Api.Migrations
 {
     [DbContext(typeof(QbDbContext))]
-    [Migration("20160821105432_Initial")]
+    [Migration("20160821151531_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -251,6 +251,8 @@ namespace Qb.Core46Api.Migrations
                     b.Property<string>("Name");
 
                     b.Property<DateTimeOffset>("CreatedAt");
+
+                    b.Property<Guid?>("CreatedBy");
 
                     b.Property<bool>("Deleted");
 

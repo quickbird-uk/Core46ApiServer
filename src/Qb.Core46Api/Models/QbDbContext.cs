@@ -44,6 +44,9 @@ namespace Qb.Core46Api.Models
             // Only entity with pk that is not ID.
             builder.Entity<CropType>().HasKey(ct => ct.Name);
 
+            // A weak unenforced foreign key to Person.
+            builder.Entity<CropType>().Property(ct => ct.CreatedBy).IsRequired(false);
+
             // Composite key.
             builder.Entity<SensorHistory>().HasKey(sd => new {sd.SensorId, sd.TimeStamp});
 

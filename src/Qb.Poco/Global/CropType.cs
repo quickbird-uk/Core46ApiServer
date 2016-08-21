@@ -14,6 +14,9 @@ namespace Qb.Poco.Global
 
         public bool Deleted { get; set; } = false;
 
+        /// <summary>The Person that created this croptype.</summary>
+        public Guid? CreatedBy { get; set; }
+
         /// <remarks>nav</remarks>
         [JsonIgnore]
         public virtual List<CropCycle> CropCycles { get; set; }

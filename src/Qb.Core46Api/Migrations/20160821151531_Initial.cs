@@ -1,6 +1,7 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Qb.Core46Api.Migrations
 {
@@ -9,31 +10,36 @@ namespace Qb.Core46Api.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                "AspNetRoles",
-                table => new
+                name: "AspNetRoles",
+                columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     ConcurrencyStamp = table.Column<string>(nullable: true),
                     Name = table.Column<string>(maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(maxLength: 256, nullable: true)
                 },
-                constraints: table => { table.PrimaryKey("PK_AspNetRoles", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
-                "AspNetUserTokens",
-                table => new
+                name: "AspNetUserTokens",
+                columns: table => new
                 {
                     UserId = table.Column<string>(nullable: false),
                     LoginProvider = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: false),
                     Value = table.Column<string>(nullable: true)
                 },
-                constraints:
-                table => { table.PrimaryKey("PK_AspNetUserTokens", x => new {x.UserId, x.LoginProvider, x.Name}); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                });
 
             migrationBuilder.CreateTable(
-                "OpenIddictApplications",
-                table => new
+                name: "OpenIddictApplications",
+                columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     ClientId = table.Column<string>(nullable: true),
@@ -43,20 +49,26 @@ namespace Qb.Core46Api.Migrations
                     RedirectUri = table.Column<string>(nullable: true),
                     Type = table.Column<string>(nullable: true)
                 },
-                constraints: table => { table.PrimaryKey("PK_OpenIddictApplications", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OpenIddictApplications", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
-                "OpenIddictScopes",
-                table => new
+                name: "OpenIddictScopes",
+                columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     Description = table.Column<string>(nullable: true)
                 },
-                constraints: table => { table.PrimaryKey("PK_OpenIddictScopes", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OpenIddictScopes", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
-                "AspNetUsers",
-                table => new
+                name: "AspNetUsers",
+                columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
@@ -74,63 +86,82 @@ namespace Qb.Core46Api.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     UserName = table.Column<string>(maxLength: 256, nullable: true)
                 },
-                constraints: table => { table.PrimaryKey("PK_AspNetUsers", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
-                "CropTypes",
-                table => new
+                name: "CropTypes",
+                columns: table => new
                 {
                     Name = table.Column<string>(nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(nullable: false),
+                    CreatedBy = table.Column<Guid>(nullable: true),
                     Deleted = table.Column<bool>(nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("PK_CropTypes", x => x.Name); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CropTypes", x => x.Name);
+                });
 
             migrationBuilder.CreateTable(
-                "Parameters",
-                table => new
+                name: "Parameters",
+                columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
                     Unit = table.Column<string>(nullable: true)
                 },
-                constraints: table => { table.PrimaryKey("PK_Parameters", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Parameters", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
-                "Placements",
-                table => new
+                name: "Placements",
+                columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true)
                 },
-                constraints: table => { table.PrimaryKey("PK_Placements", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Placements", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
-                "Subsystems",
-                table => new
+                name: "Subsystems",
+                columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true)
                 },
-                constraints: table => { table.PrimaryKey("PK_Subsystems", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subsystems", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
-                "People",
-                table => new
+                name: "People",
+                columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(nullable: false),
                     IdentityId = table.Column<string>(nullable: true),
                     UpdatedAt = table.Column<DateTimeOffset>(nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("PK_People", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_People", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
-                "AspNetRoleClaims",
-                table => new
+                name: "AspNetRoleClaims",
+                columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
@@ -142,16 +173,16 @@ namespace Qb.Core46Api.Migrations
                 {
                     table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
                     table.ForeignKey(
-                        "FK_AspNetRoleClaims_AspNetRoles_RoleId",
-                        x => x.RoleId,
-                        "AspNetRoles",
-                        "Id",
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                "AspNetUserClaims",
-                table => new
+                name: "AspNetUserClaims",
+                columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
@@ -163,16 +194,16 @@ namespace Qb.Core46Api.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
                     table.ForeignKey(
-                        "FK_AspNetUserClaims_AspNetUsers_UserId",
-                        x => x.UserId,
-                        "AspNetUsers",
-                        "Id",
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                "AspNetUserLogins",
-                table => new
+                name: "AspNetUserLogins",
+                columns: table => new
                 {
                     LoginProvider = table.Column<string>(nullable: false),
                     ProviderKey = table.Column<string>(nullable: false),
@@ -181,42 +212,42 @@ namespace Qb.Core46Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserLogins", x => new {x.LoginProvider, x.ProviderKey});
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
                     table.ForeignKey(
-                        "FK_AspNetUserLogins_AspNetUsers_UserId",
-                        x => x.UserId,
-                        "AspNetUsers",
-                        "Id",
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                "AspNetUserRoles",
-                table => new
+                name: "AspNetUserRoles",
+                columns: table => new
                 {
                     UserId = table.Column<string>(nullable: false),
                     RoleId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserRoles", x => new {x.UserId, x.RoleId});
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
                     table.ForeignKey(
-                        "FK_AspNetUserRoles_AspNetRoles_RoleId",
-                        x => x.RoleId,
-                        "AspNetRoles",
-                        "Id",
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        "FK_AspNetUserRoles_AspNetUsers_UserId",
-                        x => x.UserId,
-                        "AspNetUsers",
-                        "Id",
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                "OpenIddictAuthorizations",
-                table => new
+                name: "OpenIddictAuthorizations",
+                columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     Scope = table.Column<string>(nullable: true),
@@ -226,16 +257,16 @@ namespace Qb.Core46Api.Migrations
                 {
                     table.PrimaryKey("PK_OpenIddictAuthorizations", x => x.Id);
                     table.ForeignKey(
-                        "FK_OpenIddictAuthorizations_AspNetUsers_UserId",
-                        x => x.UserId,
-                        "AspNetUsers",
-                        "Id",
+                        name: "FK_OpenIddictAuthorizations_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                "SensorTypes",
-                table => new
+                name: "SensorTypes",
+                columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
@@ -247,28 +278,28 @@ namespace Qb.Core46Api.Migrations
                 {
                     table.PrimaryKey("PK_SensorTypes", x => x.Id);
                     table.ForeignKey(
-                        "FK_SensorTypes_Parameters_ParameterId",
-                        x => x.ParameterId,
-                        "Parameters",
-                        "Id",
+                        name: "FK_SensorTypes_Parameters_ParameterId",
+                        column: x => x.ParameterId,
+                        principalTable: "Parameters",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        "FK_SensorTypes_Placements_PlacementId",
-                        x => x.PlacementId,
-                        "Placements",
-                        "Id",
+                        name: "FK_SensorTypes_Placements_PlacementId",
+                        column: x => x.PlacementId,
+                        principalTable: "Placements",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        "FK_SensorTypes_Subsystems_SubsystemId",
-                        x => x.SubsystemId,
-                        "Subsystems",
-                        "Id",
+                        name: "FK_SensorTypes_Subsystems_SubsystemId",
+                        column: x => x.SubsystemId,
+                        principalTable: "Subsystems",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                "Locations",
-                table => new
+                name: "Locations",
+                columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(nullable: false),
@@ -281,16 +312,16 @@ namespace Qb.Core46Api.Migrations
                 {
                     table.PrimaryKey("PK_Locations", x => x.Id);
                     table.ForeignKey(
-                        "FK_Locations_People_PersonId",
-                        x => x.PersonId,
-                        "People",
-                        "Id",
+                        name: "FK_Locations_People_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "People",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
-                "OpenIddictTokens",
-                table => new
+                name: "OpenIddictTokens",
+                columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     ApplicationId = table.Column<string>(nullable: true),
@@ -302,28 +333,28 @@ namespace Qb.Core46Api.Migrations
                 {
                     table.PrimaryKey("PK_OpenIddictTokens", x => x.Id);
                     table.ForeignKey(
-                        "FK_OpenIddictTokens_OpenIddictApplications_ApplicationId",
-                        x => x.ApplicationId,
-                        "OpenIddictApplications",
-                        "Id",
+                        name: "FK_OpenIddictTokens_OpenIddictApplications_ApplicationId",
+                        column: x => x.ApplicationId,
+                        principalTable: "OpenIddictApplications",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        "FK_OpenIddictTokens_OpenIddictAuthorizations_AuthorizationId",
-                        x => x.AuthorizationId,
-                        "OpenIddictAuthorizations",
-                        "Id",
+                        name: "FK_OpenIddictTokens_OpenIddictAuthorizations_AuthorizationId",
+                        column: x => x.AuthorizationId,
+                        principalTable: "OpenIddictAuthorizations",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        "FK_OpenIddictTokens_AspNetUsers_UserId",
-                        x => x.UserId,
-                        "AspNetUsers",
-                        "Id",
+                        name: "FK_OpenIddictTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                "CropCycles",
-                table => new
+                name: "CropCycles",
+                columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(nullable: false),
@@ -340,22 +371,22 @@ namespace Qb.Core46Api.Migrations
                 {
                     table.PrimaryKey("PK_CropCycles", x => x.Id);
                     table.ForeignKey(
-                        "FK_CropCycles_CropTypes_CropTypeName",
-                        x => x.CropTypeName,
-                        "CropTypes",
-                        "Name",
+                        name: "FK_CropCycles_CropTypes_CropTypeName",
+                        column: x => x.CropTypeName,
+                        principalTable: "CropTypes",
+                        principalColumn: "Name",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        "FK_CropCycles_Locations_LocationId",
-                        x => x.LocationId,
-                        "Locations",
-                        "Id",
+                        name: "FK_CropCycles_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                "Devices",
-                table => new
+                name: "Devices",
+                columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(nullable: false),
@@ -369,16 +400,16 @@ namespace Qb.Core46Api.Migrations
                 {
                     table.PrimaryKey("PK_Devices", x => x.Id);
                     table.ForeignKey(
-                        "FK_Devices_Locations_LocationId",
-                        x => x.LocationId,
-                        "Locations",
-                        "Id",
+                        name: "FK_Devices_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                "Sensors",
-                table => new
+                name: "Sensors",
+                columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(nullable: false),
@@ -392,22 +423,22 @@ namespace Qb.Core46Api.Migrations
                 {
                     table.PrimaryKey("PK_Sensors", x => x.Id);
                     table.ForeignKey(
-                        "FK_Sensors_Devices_DeviceId",
-                        x => x.DeviceId,
-                        "Devices",
-                        "Id",
+                        name: "FK_Sensors_Devices_DeviceId",
+                        column: x => x.DeviceId,
+                        principalTable: "Devices",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        "FK_Sensors_SensorTypes_SensorTypeId",
-                        x => x.SensorTypeId,
-                        "SensorTypes",
-                        "Id",
+                        name: "FK_Sensors_SensorTypes_SensorTypeId",
+                        column: x => x.SensorTypeId,
+                        principalTable: "SensorTypes",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                "SensorHistories",
-                table => new
+                name: "SensorHistories",
+                columns: table => new
                 {
                     SensorId = table.Column<Guid>(nullable: false),
                     TimeStamp = table.Column<DateTimeOffset>(nullable: false),
@@ -417,211 +448,211 @@ namespace Qb.Core46Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SensorHistories", x => new {x.SensorId, x.TimeStamp});
+                    table.PrimaryKey("PK_SensorHistories", x => new { x.SensorId, x.TimeStamp });
                     table.ForeignKey(
-                        "FK_SensorHistories_Locations_LocationId",
-                        x => x.LocationId,
-                        "Locations",
-                        "Id",
+                        name: "FK_SensorHistories_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        "FK_SensorHistories_Sensors_SensorId",
-                        x => x.SensorId,
-                        "Sensors",
-                        "Id",
+                        name: "FK_SensorHistories_Sensors_SensorId",
+                        column: x => x.SensorId,
+                        principalTable: "Sensors",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                "RoleNameIndex",
-                "AspNetRoles",
-                "NormalizedName");
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName");
 
             migrationBuilder.CreateIndex(
-                "IX_AspNetRoleClaims_RoleId",
-                "AspNetRoleClaims",
-                "RoleId");
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                "IX_AspNetUserClaims_UserId",
-                "AspNetUserClaims",
-                "UserId");
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                "IX_AspNetUserLogins_UserId",
-                "AspNetUserLogins",
-                "UserId");
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                "IX_AspNetUserRoles_RoleId",
-                "AspNetUserRoles",
-                "RoleId");
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                "IX_AspNetUserRoles_UserId",
-                "AspNetUserRoles",
-                "UserId");
+                name: "IX_AspNetUserRoles_UserId",
+                table: "AspNetUserRoles",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                "IX_OpenIddictApplications_ClientId",
-                "OpenIddictApplications",
-                "ClientId",
+                name: "IX_OpenIddictApplications_ClientId",
+                table: "OpenIddictApplications",
+                column: "ClientId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                "IX_OpenIddictAuthorizations_UserId",
-                "OpenIddictAuthorizations",
-                "UserId");
+                name: "IX_OpenIddictAuthorizations_UserId",
+                table: "OpenIddictAuthorizations",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                "IX_OpenIddictTokens_ApplicationId",
-                "OpenIddictTokens",
-                "ApplicationId");
+                name: "IX_OpenIddictTokens_ApplicationId",
+                table: "OpenIddictTokens",
+                column: "ApplicationId");
 
             migrationBuilder.CreateIndex(
-                "IX_OpenIddictTokens_AuthorizationId",
-                "OpenIddictTokens",
-                "AuthorizationId");
+                name: "IX_OpenIddictTokens_AuthorizationId",
+                table: "OpenIddictTokens",
+                column: "AuthorizationId");
 
             migrationBuilder.CreateIndex(
-                "IX_OpenIddictTokens_UserId",
-                "OpenIddictTokens",
-                "UserId");
+                name: "IX_OpenIddictTokens_UserId",
+                table: "OpenIddictTokens",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                "EmailIndex",
-                "AspNetUsers",
-                "NormalizedEmail");
+                name: "EmailIndex",
+                table: "AspNetUsers",
+                column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                "UserNameIndex",
-                "AspNetUsers",
-                "NormalizedUserName",
+                name: "UserNameIndex",
+                table: "AspNetUsers",
+                column: "NormalizedUserName",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                "IX_SensorTypes_ParameterId",
-                "SensorTypes",
-                "ParameterId");
+                name: "IX_SensorTypes_ParameterId",
+                table: "SensorTypes",
+                column: "ParameterId");
 
             migrationBuilder.CreateIndex(
-                "IX_SensorTypes_PlacementId",
-                "SensorTypes",
-                "PlacementId");
+                name: "IX_SensorTypes_PlacementId",
+                table: "SensorTypes",
+                column: "PlacementId");
 
             migrationBuilder.CreateIndex(
-                "IX_SensorTypes_SubsystemId",
-                "SensorTypes",
-                "SubsystemId");
+                name: "IX_SensorTypes_SubsystemId",
+                table: "SensorTypes",
+                column: "SubsystemId");
 
             migrationBuilder.CreateIndex(
-                "IX_CropCycles_CropTypeName",
-                "CropCycles",
-                "CropTypeName");
+                name: "IX_CropCycles_CropTypeName",
+                table: "CropCycles",
+                column: "CropTypeName");
 
             migrationBuilder.CreateIndex(
-                "IX_CropCycles_LocationId",
-                "CropCycles",
-                "LocationId");
+                name: "IX_CropCycles_LocationId",
+                table: "CropCycles",
+                column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                "IX_Devices_LocationId",
-                "Devices",
-                "LocationId");
+                name: "IX_Devices_LocationId",
+                table: "Devices",
+                column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                "IX_Locations_PersonId",
-                "Locations",
-                "PersonId");
+                name: "IX_Locations_PersonId",
+                table: "Locations",
+                column: "PersonId");
 
             migrationBuilder.CreateIndex(
-                "IX_Sensors_DeviceId",
-                "Sensors",
-                "DeviceId");
+                name: "IX_Sensors_DeviceId",
+                table: "Sensors",
+                column: "DeviceId");
 
             migrationBuilder.CreateIndex(
-                "IX_Sensors_SensorTypeId",
-                "Sensors",
-                "SensorTypeId");
+                name: "IX_Sensors_SensorTypeId",
+                table: "Sensors",
+                column: "SensorTypeId");
 
             migrationBuilder.CreateIndex(
-                "IX_SensorHistories_LocationId",
-                "SensorHistories",
-                "LocationId");
+                name: "IX_SensorHistories_LocationId",
+                table: "SensorHistories",
+                column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                "IX_SensorHistories_SensorId",
-                "SensorHistories",
-                "SensorId");
+                name: "IX_SensorHistories_SensorId",
+                table: "SensorHistories",
+                column: "SensorId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                "AspNetRoleClaims");
+                name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
-                "AspNetUserClaims");
+                name: "AspNetUserClaims");
 
             migrationBuilder.DropTable(
-                "AspNetUserLogins");
+                name: "AspNetUserLogins");
 
             migrationBuilder.DropTable(
-                "AspNetUserRoles");
+                name: "AspNetUserRoles");
 
             migrationBuilder.DropTable(
-                "AspNetUserTokens");
+                name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                "OpenIddictScopes");
+                name: "OpenIddictScopes");
 
             migrationBuilder.DropTable(
-                "OpenIddictTokens");
+                name: "OpenIddictTokens");
 
             migrationBuilder.DropTable(
-                "CropCycles");
+                name: "CropCycles");
 
             migrationBuilder.DropTable(
-                "SensorHistories");
+                name: "SensorHistories");
 
             migrationBuilder.DropTable(
-                "AspNetRoles");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                "OpenIddictApplications");
+                name: "OpenIddictApplications");
 
             migrationBuilder.DropTable(
-                "OpenIddictAuthorizations");
+                name: "OpenIddictAuthorizations");
 
             migrationBuilder.DropTable(
-                "CropTypes");
+                name: "CropTypes");
 
             migrationBuilder.DropTable(
-                "Sensors");
+                name: "Sensors");
 
             migrationBuilder.DropTable(
-                "AspNetUsers");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                "Devices");
+                name: "Devices");
 
             migrationBuilder.DropTable(
-                "SensorTypes");
+                name: "SensorTypes");
 
             migrationBuilder.DropTable(
-                "Locations");
+                name: "Locations");
 
             migrationBuilder.DropTable(
-                "Parameters");
+                name: "Parameters");
 
             migrationBuilder.DropTable(
-                "Placements");
+                name: "Placements");
 
             migrationBuilder.DropTable(
-                "Subsystems");
+                name: "Subsystems");
 
             migrationBuilder.DropTable(
-                "People");
+                name: "People");
         }
     }
 }
