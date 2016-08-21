@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using OpenIddict;
 using Qb.Poco;
 using Qb.Poco.Global;
-using Qb.Poco.Hardware;
 using Qb.Poco.User;
 
 namespace Qb.Core46Api.Models
@@ -40,38 +39,22 @@ namespace Qb.Core46Api.Models
         /// <summary>Depends on Locations and Sensors.</summary>
         public DbSet<SensorHistory> SensorHistories { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Person>().HasKey(p => p.Id);
-            builder.Entity<Person>().Property(p => p.Id).ValueGeneratedNever();
+            // Only entity with pk that is not ID.
+            builder.Entity<CropType>().HasKey(ct => ct.Name);
 
+            // Composite key.
             builder.Entity<SensorHistory>().HasKey(sd => new {sd.SensorId, sd.TimeStamp});
 
-            builder.Entity<Location>().Property(gh => gh.Person).IsRequired();
+            // Set optional foreign key, defaults delete to restrict.
+            builder.Entity<Location>().Property(loc => loc.PersonId).IsRequired(false);
+            // Changed behaviour to setnull, allows remaking people without hurtning data.
             builder.Entity<Location>()
-                .HasOne(gh => gh.Person)
+                .HasOne(loc => loc.Person)
                 .WithMany(p => p.Locations)
-                .HasForeignKey(gh => gh.PersonId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-
-            builder.Entity<Location>()
-                .HasMany(gh => gh.SensorHistories)
-                .WithOne(sd => sd.Location)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
-
-            //Add index on cropType Name and make it non Db generated
-            builder.Entity<CropType>().HasKey(ct => ct.Name);
-            builder.Entity<CropType>().Property(ct => ct.Name).ValueGeneratedNever();
-
-            builder.Entity<CropType>()
-                .HasMany(ct => ct.CropCycles)
-                .WithOne(cc => cc.CropType)
-                .HasForeignKey(cc => cc.CropTypeName);
-
-            builder.Entity<SensorHistory>().HasIndex(sh => sh.UploadedAt);
 
             base.OnModelCreating(builder);
         }

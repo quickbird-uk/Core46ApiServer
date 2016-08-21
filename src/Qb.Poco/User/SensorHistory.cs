@@ -1,6 +1,5 @@
 ﻿using System;
 using Newtonsoft.Json;
-using Qb.Poco.Hardware;
 
 namespace Qb.Poco.User
 {

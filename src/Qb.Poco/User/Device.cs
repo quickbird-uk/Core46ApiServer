@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Qb.Poco.User;
 
-namespace Qb.Poco.Hardware
+namespace Qb.Poco.User
 {
     public class Device : BaseEntity
     {

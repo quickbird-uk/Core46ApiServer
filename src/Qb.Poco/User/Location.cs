@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Qb.Poco.Hardware;
 
 namespace Qb.Poco.User
 {
@@ -10,7 +9,7 @@ namespace Qb.Poco.User
         public string Name { get; set; }
 
         /// <remarks>fk</remarks>
-        public Guid PersonId { get; set; }
+        public Guid? PersonId { get; set; }
 
         /// <remarks>fk-nav</remarks>
         [JsonIgnore]

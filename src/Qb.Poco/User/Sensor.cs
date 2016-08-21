@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Qb.Poco.Global;
-using Qb.Poco.User;
 
-namespace Qb.Poco.Hardware
+namespace Qb.Poco.User
 {
     public class Sensor : BaseEntity
     {
