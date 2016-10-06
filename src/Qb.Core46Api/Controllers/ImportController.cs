@@ -52,11 +52,20 @@ namespace Qb.Core46Api.Controllers
                 var sensorTypes = await GetAndParseJson("sensorTypes", client);
                 var placements = await GetAndParseJson("placements", client);
 
-                await _db.Parameters.AddOrUpdateRange(ConvertParameters(parameters), (p1, p2) => p1.Id == p2.Id);
-                await _db.Subsystems.AddOrUpdateRange(ConvertSubsystems(subsystems), (p1, p2) => p1.Id == p2.Id);
-                await _db.CropTypes.AddOrUpdateRange(ConvertCropTypes(croptypes), (p1, p2) => p1.Name == p2.Name);
-                await _db.SensorTypes.AddOrUpdateRange(ConvertSensorTypes(sensorTypes), (p1, p2) => p1.Id == p2.Id);
-                await _db.Placements.AddOrUpdateRange(ConvertPlacements(placements), (p1, p2) => p1.Id == p2.Id);
+                await _db.Parameters.AddOrUpdateRange(
+                    ConvertParameters(parameters), (p1, p2) => p1.Id == p2.Id);
+
+                await _db.Subsystems.AddOrUpdateRange(
+                    ConvertSubsystems(subsystems), (p1, p2) => p1.Id == p2.Id);
+
+                await _db.CropTypes.AddOrUpdateRange(
+                    ConvertCropTypes(croptypes), (p1, p2) => p1.Name == p2.Name);
+
+                await _db.SensorTypes.AddOrUpdateRange(
+                    ConvertSensorTypes(sensorTypes), (p1, p2) => p1.Id == p2.Id);
+
+                await _db.Placements.AddOrUpdateRange(
+                    ConvertPlacements(placements), (p1, p2) => p1.Id == p2.Id);
 
                 await _db.SaveChangesAsync();
 
@@ -86,26 +95,12 @@ namespace Qb.Core46Api.Controllers
 
         private IEnumerable<CropType> ConvertCropTypes(JArray croptypes)
         {
-            return croptypes.Select(ct =>
+            return croptypes.Select(ct => new CropType
             {
-                var createdAt = (string) ct["CreatedAt"];
-                Debug.WriteLine(CultureInfo.CurrentCulture);
-                Debug.WriteLine($"Parseing >> 6/02/2016 00:00:00 <<");
-                Debug.WriteLine($"result: {DateTimeOffset.Parse(" 6/02/2016 00:00:00 ")}");
-                string x = " " + createdAt + " ";
-                Debug.WriteLine($"Parseing >>{x}<<");
-                Debug.WriteLine($"result: {DateTimeOffset.Parse(x)}");
-
-                Debug.WriteLine($"GOING TO PARSE \n>>{createdAt}<<");
-                var parsed = DateTimeOffset.Parse(createdAt.ToString());
-                Debug.WriteLine("parsed:" + parsed);
-                return new CropType
-                {
-                    Name = (string) ct["Name"],
-                    CreatedAt = DateTimeOffset.Parse(createdAt),
-                    CreatedBy = Guid.Parse((string) ct["CreatedBy"]),
-                    Deleted = false
-                };
+                Name = (string) ct["Name"],
+                CreatedAt = ParseUsDate((string) ct["CreatedAt"]),
+                CreatedBy = Guid.Parse((string) ct["CreatedBy"]),
+                Deleted = false
             });
         }
 
@@ -136,6 +131,12 @@ namespace Qb.Core46Api.Controllers
             var content = await response.Content.ReadAsStringAsync();
             var json = JArray.Parse(content);
             return json;
+        }
+
+        private DateTimeOffset ParseUsDate(string date)
+        {
+            return DateTimeOffset.ParseExact(date, @"MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+
         }
     }
 }
