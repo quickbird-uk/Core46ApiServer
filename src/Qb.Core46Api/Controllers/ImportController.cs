@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -84,12 +86,26 @@ namespace Qb.Core46Api.Controllers
 
         private IEnumerable<CropType> ConvertCropTypes(JArray croptypes)
         {
-            return croptypes.Select(ct => new CropType
+            return croptypes.Select(ct =>
             {
-                Name = (string) ct["Name"],
-                CreatedAt = DateTimeOffset.Parse((string) ct["CreatedAt"]),
-                CreatedBy = Guid.Parse((string) ct["CreatedBy"]),
-                Deleted = false
+                var createdAt = (string) ct["CreatedAt"];
+                Debug.WriteLine(CultureInfo.CurrentCulture);
+                Debug.WriteLine($"Parseing >> 6/02/2016 00:00:00 <<");
+                Debug.WriteLine($"result: {DateTimeOffset.Parse(" 6/02/2016 00:00:00 ")}");
+                string x = " " + createdAt + " ";
+                Debug.WriteLine($"Parseing >>{x}<<");
+                Debug.WriteLine($"result: {DateTimeOffset.Parse(x)}");
+
+                Debug.WriteLine($"GOING TO PARSE \n>>{createdAt}<<");
+                var parsed = DateTimeOffset.Parse(createdAt.ToString());
+                Debug.WriteLine("parsed:" + parsed);
+                return new CropType
+                {
+                    Name = (string) ct["Name"],
+                    CreatedAt = DateTimeOffset.Parse(createdAt),
+                    CreatedBy = Guid.Parse((string) ct["CreatedBy"]),
+                    Deleted = false
+                };
             });
         }
 
