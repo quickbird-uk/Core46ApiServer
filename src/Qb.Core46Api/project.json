@@ -17,7 +17,7 @@
     "Swashbuckle": "6.0.0-beta902",
     "Twilio": "5.0.0-rc4",
     "Qb.Poco": "*",
-    "Microsoft.ApplicationInsights.AspNetCore": "1.0.1",
+    "Microsoft.ApplicationInsights.AspNetCore": "1.0.2",
     "Microsoft.AspNetCore.Mvc": "1.0.1",
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.1",
     "Microsoft.EntityFrameworkCore.SqlServer": "1.0.1"
