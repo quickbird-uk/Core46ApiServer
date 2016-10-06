@@ -147,6 +147,8 @@ namespace Qb.Core64Api.Tests.Integration
             var userTokenReq = CreateUserTokenContent();
 
             var tokenResponseBeforeVerify = await _client.PostAsync("/api/auth/token", userTokenReq);
+            Debug.WriteLine(await tokenResponseBeforeVerify.Content.ReadAsStringAsync());
+            Debug.WriteLine(tokenResponseBeforeVerify.ToString());
             Assert.True(tokenResponseBeforeVerify.StatusCode != HttpStatusCode.OK,
                 "New user got token without verifying.");
 

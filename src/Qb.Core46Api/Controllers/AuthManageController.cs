@@ -61,6 +61,9 @@ namespace Qb.Core46Api.Controllers
             return response;
         }
 
+
+
+
         /// <summary>Test authorization for any user (404 on fail).</summary>
         [Authorize]
         [HttpGet("[action]")]
