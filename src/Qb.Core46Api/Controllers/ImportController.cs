@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Qb.Core46Api.Helpers;
 using Qb.Core46Api.Models;
@@ -52,24 +52,45 @@ namespace Qb.Core46Api.Controllers
                 var sensorTypes = await GetAndParseJson("sensorTypes", client);
                 var placements = await GetAndParseJson("placements", client);
 
-                await _db.Parameters.AddOrUpdateRange(
-                    ConvertParameters(parameters), (p1, p2) => p1.Id == p2.Id);
-
-                await _db.Subsystems.AddOrUpdateRange(
-                    ConvertSubsystems(subsystems), (p1, p2) => p1.Id == p2.Id);
 
                 await _db.CropTypes.AddOrUpdateRange(
                     ConvertCropTypes(croptypes), (p1, p2) => p1.Name == p2.Name);
-
-                await _db.SensorTypes.AddOrUpdateRange(
-                    ConvertSensorTypes(sensorTypes), (p1, p2) => p1.Id == p2.Id);
+                // This save doesn't require IdentityInsert, gets bundled into the next save.
+                await _db.Parameters.AddOrUpdateRange(
+                    ConvertParameters(parameters), (p1, p2) => p1.Id == p2.Id);
+                SaveIdentityInsert("Parameters", _db);
 
                 await _db.Placements.AddOrUpdateRange(
                     ConvertPlacements(placements), (p1, p2) => p1.Id == p2.Id);
+                SaveIdentityInsert("Placements", _db);
 
-                await _db.SaveChangesAsync();
+                await _db.Subsystems.AddOrUpdateRange(
+                    ConvertSubsystems(subsystems), (p1, p2) => p1.Id == p2.Id);
+                SaveIdentityInsert("Subsystems", _db);
+
+                await _db.SensorTypes.AddOrUpdateRange(
+                    ConvertSensorTypes(sensorTypes), (p1, p2) => p1.Id == p2.Id);
+                SaveIdentityInsert("SensorTypes", _db);
+
+                //await _db.SaveChangesAsync();
 
                 return Content($"[{parameters},{subsystems},{croptypes},{sensorTypes},{placements}]");
+            }
+        }
+
+
+        private void SaveIdentityInsert(string name, DbContext db)
+        {
+            db.Database.OpenConnection();
+            try
+            {
+                db.Database.ExecuteSqlCommand($"SET IDENTITY_INSERT dbo.{name} ON");
+                db.SaveChanges();
+                db.Database.ExecuteSqlCommand($"SET IDENTITY_INSERT dbo.{name} OFF");
+            }
+            finally
+            {
+                db.Database.CloseConnection();
             }
         }
 
@@ -136,7 +157,6 @@ namespace Qb.Core46Api.Controllers
         private DateTimeOffset ParseUsDate(string date)
         {
             return DateTimeOffset.ParseExact(date, @"MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-
         }
     }
 }
