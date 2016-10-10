@@ -112,14 +112,44 @@ namespace Qb.Core46Api.Controllers
         [Authorize(Roles = Roles.EditUserData)]
         public async Task<IActionResult> SetUserData(Poco.User.SyncData syncData)
         {
-            try
+            var user = await _userManager.GetUserAsync(User);
+            var userId = new Guid(user.Id);
+            if (syncData.People.Any() && (syncData.People.First().Id != userId))
+                return BadRequest("Non-matching user id.");
+            if (syncData.Locations.Any(l => l.PersonId != userId))
+                return BadRequest("Can't edit data with non-matching user.");
+
+            // These two requre a db query to make sure they have valid locations (owned by them).
+            if (syncData.Devices.Any() || syncData.CropCycles.Any() || syncData.Sensors.Any())
             {
+                var existingLocations = await _db.Locations.Where(l => l.PersonId == userId).ToListAsync();
+                // The personId on the syncData locations has been checked already, new locations sent are valid too.
+                var existingLocationIds = existingLocations.Concat(existingLocations).Select(l => l.Id).ToList();
+                if (!syncData.Devices.All(d => existingLocationIds.Contains(d.LocationId)) ||
+                    !syncData.CropCycles.All(c => existingLocationIds.Contains(c.LocationId)))
+                    return BadRequest("Can't edit data with non-matching user.");
+
+                if (syncData.Sensors.Any())
+                {
+                    var validDeviceIds = (await _db.Devices.Where(d => existingLocationIds.Contains(d.LocationId))
+                            .Select(d => d.Id).ToListAsync())
+                        .Concat(syncData.Devices.Select(d => d.Id));
+                    if (!syncData.Sensors.All(s => validDeviceIds.Contains(s.DeviceId)))
+                    {
+                        return BadRequest("Can't edit data with non-matching user.");
+                    }
+                }
             }
-            catch (Exception e)
-            {
-                _logger.LogError(LogIds.EditUserData, e, "Failed to SetUserData.");
-                return BadRequest("Data invalid or corrupt.");
-            }
+
+            // The data is valid so save it.
+
+            await _db.People.AddOrUpdateRange(syncData.People, (a, b) => a.Id == b.Id);
+            await _db.Locations.AddOrUpdateRange(syncData.Locations, (a, b) => a.Id == b.Id);
+            await _db.Devices.AddOrUpdateRange(syncData.Devices, (a, b) => a.Id == b.Id);
+            await _db.CropCycles.AddOrUpdateRange(syncData.CropCycles, (a, b) => a.Id == b.Id);
+            await _db.Sensors.AddOrUpdateRange(syncData.Sensors, (a, b) => a.Id == b.Id);
+            await _db.SaveChangesAsync();
+
             return new OkResult();
         }
     }
