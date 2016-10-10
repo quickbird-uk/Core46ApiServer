@@ -81,5 +81,18 @@ namespace Qb.Core46Api.Controllers
             }
             return new OkResult();
         }
+
+        public async Task<IActionResult> SetUserData(Poco.User.SyncData syncData)
+        {
+            try
+            {
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(100, e, "Failed to SetUserData.");
+                return BadRequest("Data invalid or corrupt.");
+            }
+            return new OkResult();
+        }
     }
 }
