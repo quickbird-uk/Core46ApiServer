@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OpenIddict;
 using Qb.Core46Api.Helpers;
 using Qb.Core46Api.Models;
 using Qb.Core46Api.Vars;
@@ -19,13 +20,16 @@ namespace Qb.Core46Api.Controllers
     {
         private readonly QbDbContext _db;
         private readonly ILogger<SyncController> _logger;
+        private readonly OpenIddictUserManager<QbUser> _userManager;
 
         /// <summary>Initialise with a dbContext, per request and a logger for errors.</summary>
         /// <param name="db">Database context, should last per request.</param>
         /// <param name="loggerFactory">ASP Core logger.</param>
-        public SyncController(QbDbContext db, ILoggerFactory loggerFactory)
+        /// <param name="userManager">ASP Identity user manager.</param>
+        public SyncController(QbDbContext db, ILoggerFactory loggerFactory, OpenIddictUserManager<QbUser> userManager)
         {
             _db = db;
+            _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SyncController>();
         }
 
@@ -54,12 +58,33 @@ namespace Qb.Core46Api.Controllers
             // The client will regard itself be up-to-date to this time.
             var serverDateTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var startDateTime = DateTimeOffset.FromUnixTimeSeconds(startUnixUtcTimeSeconds ?? 0);
-            var people = await _db.People.Where(p => p.UpdatedAt >= startDateTime).ToArrayAsync();
 
-            var locations = await _db.Locations.Where(l => l.UpdatedAt >= startDateTime).ToArrayAsync();
-            var devices = await _db.Devices.Where(d => d.UpdatedAt >= startDateTime).ToArrayAsync();
-            var cropcycles = await _db.CropCycles.Where(c => c.UpdatedAt >= startDateTime).ToArrayAsync();
-            var sensors = await _db.Sensors.Where(s => s.UpdatedAt >= startDateTime).ToArrayAsync();
+            var user = await _userManager.GetUserAsync(User);
+            var userGuid = new Guid(user.Id);
+
+            // This will be an array with either 1 or 0 entries. This is more conventient than not using an array.
+            var people = await _db.People
+                .Where(p => p.Id == userGuid)
+                .Where(p => p.UpdatedAt >= startDateTime).ToArrayAsync();
+
+            var locations = await _db.Locations
+                .Where(l => l.PersonId == userGuid)
+                .Where(l => l.UpdatedAt >= startDateTime).ToArrayAsync();
+
+            var locationIds = locations.Select(l => l.Id);
+
+            var devices = await _db.Devices
+                .Where(d => locationIds.Contains(d.LocationId))
+                .Where(d => d.UpdatedAt >= startDateTime).ToArrayAsync();
+
+            var cropcycles = await _db.CropCycles
+                .Where(c => locationIds.Contains(c.LocationId))
+                .Where(c => c.UpdatedAt >= startDateTime).ToArrayAsync();
+
+            var cropCycleIds = cropcycles.Select(c => c.Id);
+            var sensors = await _db.Sensors
+                .Where(s => cropCycleIds.Contains(s.Id))
+                .Where(s => s.UpdatedAt >= startDateTime).ToArrayAsync();
 
             var userData = new Poco.User.SyncData(serverDateTime, people, locations, devices, cropcycles, sensors);
             return new JsonResult(userData);
