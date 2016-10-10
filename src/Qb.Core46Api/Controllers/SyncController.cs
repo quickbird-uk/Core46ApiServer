@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using OpenIddict;
 using Qb.Core46Api.Helpers;
 using Qb.Core46Api.Models;
 using Qb.Core46Api.Vars;
@@ -19,13 +20,16 @@ namespace Qb.Core46Api.Controllers
     {
         private readonly QbDbContext _db;
         private readonly ILogger<SyncController> _logger;
+        private readonly OpenIddictUserManager<QbUser> _userManager;
 
         /// <summary>Initialise with a dbContext, per request and a logger for errors.</summary>
         /// <param name="db">Database context, should last per request.</param>
         /// <param name="loggerFactory">ASP Core logger.</param>
-        public SyncController(QbDbContext db, ILoggerFactory loggerFactory)
+        /// <param name="userManager">Identity user manager - for getting user ID.</param>
+        public SyncController(QbDbContext db, ILoggerFactory loggerFactory, OpenIddictUserManager<QbUser> userManager)
         {
             _db = db;
+            _userManager = userManager;
             _logger = loggerFactory.CreateLogger<SyncController>();
         }
 
@@ -50,18 +54,30 @@ namespace Qb.Core46Api.Controllers
         ///     serverDateTime just before the queries to get the data are made.</returns>
         public async Task<IActionResult> GetUserData(long? startUnixUtcTimeSeconds)
         {
+            var user = await _userManager.GetUserAsync(User);
+            var personId = new Guid(user.Id);
             // Get the current server time before any database requests are started.
             // The client will regard itself be up-to-date to this time.
             var serverDateTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var startDateTime = DateTimeOffset.FromUnixTimeSeconds(startUnixUtcTimeSeconds ?? 0);
-            var people = await _db.People.Where(p => p.UpdatedAt >= startDateTime).ToArrayAsync();
-
-            var locations = await _db.Locations.Where(l => l.UpdatedAt >= startDateTime).ToArrayAsync();
-            var devices = await _db.Devices.Where(d => d.UpdatedAt >= startDateTime).ToArrayAsync();
+            var person =
+                await
+                    _db.People.Where(p => p.Id == personId)
+                        .Include(p => p.Locations.Where()).ThenInclude(l => l.Devices).ThenInclude(d => d.Sensors)
+                        .Include(p => p.Locations).ThenInclude(l => l.CropCycles)
+                        .ToArrayAsync();
+            //Do an include query and then flatten .
+            var locations =
+                await
+                    _db.Locations.Where(l => l.PersonId == personId)
+                        .Where(l => l.UpdatedAt >= startDateTime)
+                        .ToArrayAsync();
+            var devices =
+                await _db.Devices.Where(d => d.LocationId ==).Where(d => d.UpdatedAt >= startDateTime).ToArrayAsync();
             var cropcycles = await _db.CropCycles.Where(c => c.UpdatedAt >= startDateTime).ToArrayAsync();
             var sensors = await _db.Sensors.Where(s => s.UpdatedAt >= startDateTime).ToArrayAsync();
 
-            var userData = new Poco.User.SyncData(serverDateTime, people, locations, devices, cropcycles, sensors);
+            var userData = new Poco.User.SyncData(serverDateTime, person, locations, devices, cropcycles, sensors);
             return new JsonResult(userData);
         }
 
