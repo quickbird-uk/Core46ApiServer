@@ -31,12 +31,12 @@ namespace Qb.Core46Api.Controllers
         }
 
         /// <summary>Admin is the god role, never give to users.</summary>
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = Vars.Roles.Admin)]
         [HttpPost("[action]")]
         public async Task<IActionResult> GrantAdminRole(string username)
         {
             var user = await _userManager.FindByNameAsync(username);
-            var result = await _userManager.AddToRoleAsync(user, "admin");
+            var result = await _userManager.AddToRoleAsync(user, Vars.Roles.Admin);
             if (result.Succeeded)
                 return Res.PlainUtf8($"Admin role granted to {username}.");
 
@@ -45,7 +45,7 @@ namespace Qb.Core46Api.Controllers
         }
 
         /// <summary>Sets phone number for a user skipping text authorization.</summary>
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = Vars.Roles.Admin)]
         [HttpPost("[action]")]
         public async Task<IActionResult> SetPhonenumberAndConfirm(string username, string phonenumber)
         {
@@ -74,7 +74,7 @@ namespace Qb.Core46Api.Controllers
 
         /// <summary>Test if admin role authorization is granted (404 on fail).</summary>
         /// <returns></returns>
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = Vars.Roles.Admin)]
         [HttpGet("[action]")]
         public IActionResult AmIAuthorizedAdmin()
         {
@@ -83,7 +83,7 @@ namespace Qb.Core46Api.Controllers
 
 
         /// <summary>Gets a phone auth token - for testing.</summary>
-        //[Authorize(Roles = "admin")]
+        //[Authorize(Roles = Vars.Roles.Admin)]
         [HttpPost("[action]")]
         public async Task<IActionResult> GetPhoneTokenDirect(string username, string phonenumber)
         {
@@ -102,7 +102,7 @@ namespace Qb.Core46Api.Controllers
             return Res.PlainUtf8(phoneToken);
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = Vars.Roles.Admin)]
         [HttpPost("[action]")]
         public async Task<IActionResult> DeleteUser(string username)
         {

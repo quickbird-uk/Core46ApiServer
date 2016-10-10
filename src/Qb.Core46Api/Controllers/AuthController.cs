@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Extensions;
@@ -12,6 +13,7 @@ using OpenIddict;
 using Qb.Core46Api.Helpers;
 using Qb.Core46Api.Models;
 using Qb.Core46Api.Services;
+using Qb.Poco;
 
 namespace Qb.Core46Api.Controllers
 {
@@ -109,7 +111,7 @@ namespace Qb.Core46Api.Controllers
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> Register(string username, string password, string phonenumber,
-            [FromServices] ISmsSender smsSender)
+            [FromServices] ISmsSender smsSender, [FromServices] QbDbContext db)
         {
             var pars = new[] {username, password, phonenumber};
             if (pars.Any(string.IsNullOrWhiteSpace))
@@ -127,6 +129,12 @@ namespace Qb.Core46Api.Controllers
             if (res.Succeeded)
             {
                 user = await _userManager.FindByNameAsync(username);
+                // Creates a full user with all edit abilities for own information.
+                var userGuid = new Guid(user.Id);
+
+                // Create a Person with the same guid as the identity user.
+                await CreatePerson(userGuid, db);
+
                 var phoneToken = await _userManager.GenerateChangePhoneNumberTokenAsync(user, phonenumber);
 
                 // Ignore used for manual admin verified user.
@@ -140,6 +148,22 @@ namespace Qb.Core46Api.Controllers
             }
 
             return Res.PlainUtf8(res.PrettyErrors(), 400);
+        }
+
+        /// <summary>Creates a Person in the DB. The Person object has no knowledge of ASP.Net Identity. The Person's Guid will be
+        ///     the same as the ID of the IdentityUser's Id, which is a Guid stored as a string.</summary>
+        /// <param name="userGuid">The guid that the identity system will use to refer to this Person.</param>
+        /// <param name="db">The databse context.</param>
+        /// <returns>Awaitable, waiting the save on the database.</returns>
+        private async Task CreatePerson(Guid userGuid, QbDbContext db)
+        {
+            // The update and create dates are auto-initialised.
+            var person = new Person
+            {
+                Id = userGuid
+            };
+            db.People.Add(person);
+            await db.SaveChangesAsync();
         }
 
 

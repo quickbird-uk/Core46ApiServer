@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Qb.Core46Api.Helpers;
 using Qb.Core46Api.Models;
+using Qb.Core46Api.Vars;
 using Qb.Poco.Global;
 
 namespace Qb.Core46Api.Controllers
@@ -64,6 +65,7 @@ namespace Qb.Core46Api.Controllers
             return new JsonResult(userData);
         }
 
+        [Authorize(Roles = Roles.EditGlobalData)]
         public async Task<IActionResult> SetGlobals([FromBody] SyncData syncData)
         {
             try
@@ -76,12 +78,13 @@ namespace Qb.Core46Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(100, e, "Failed to SetGlobals.");
+                _logger.LogError(LogIds.EditGlobalData, e, "Failed to SetGlobals.");
                 return BadRequest("Data invalid or corrupt.");
             }
             return new OkResult();
         }
 
+        [Authorize(Roles = Roles.EditUserData)]
         public async Task<IActionResult> SetUserData(Poco.User.SyncData syncData)
         {
             try
@@ -89,7 +92,7 @@ namespace Qb.Core46Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(100, e, "Failed to SetUserData.");
+                _logger.LogError(LogIds.EditUserData, e, "Failed to SetUserData.");
                 return BadRequest("Data invalid or corrupt.");
             }
             return new OkResult();

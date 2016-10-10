@@ -53,7 +53,7 @@ Have a look at the database in `SQL Server Object Explorer` in Visual Studio and
 
 ## Publishing Production to Azure
 
-* Must tick the migrate option on publishing to apply the migration to the server, needs to be doen on every new migration.
+* Must tick the migrate option on publishing to apply the migration to the server, needs to be done on every new migration.
 
 > It is possible to use `dotnet ef database update --environment production` instead, but the Azure database connection string will need to the `appsettings.json` (bad because it is inflexible).
 
@@ -79,7 +79,7 @@ The MVC `TestController` class exists to test that the basic parts of the server
 
 ### Admin user
 
-When server is started a default admin user is created if it does not exists. This uses has the `admin` role, this give it access to apis that can modify and verify users, which are marked with the `[Authorize(Roles = "admin")]` attribute.
+When server is started a default admin user is created if it does not exists. This uses has the `admin` role, this give it access to apis that can modify and verify users, which are marked with the `[Authorize(Roles = Vars.Roles.Admin)]` attribute.
 
 ```
 username = admin
