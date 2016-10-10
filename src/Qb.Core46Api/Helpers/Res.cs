@@ -18,5 +18,20 @@ namespace Qb.Core46Api.Helpers
                 StatusCode = 200
             };
         }
+
+        /// <summary>Sends {"error": errorMessage} with application/json and status 400 explicitly set.</summary>
+        /// <param name="errorMessage">The message to put in the json.</param>
+        /// <param name="statusCode">Status code.</param>
+        /// <returns>A Json ContentResult.</returns>
+        public static ContentResult JsonErrorResult(string errorMessage, int statusCode)
+        {
+            var cr = new ContentResult
+            {
+                StatusCode = statusCode,
+                Content = "{\"error\" : \"" + errorMessage + "\"}",
+                ContentType = "application/json"
+            };
+            return cr;
+        }
     }
 }
