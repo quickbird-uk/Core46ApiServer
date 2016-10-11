@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,8 @@ using OpenIddict;
 using Qb.Core46Api.Helpers;
 using Qb.Core46Api.Models;
 using Qb.Core46Api.Vars;
-using Qb.Poco.Global;
+using Qb.Poco.User;
+using SyncData = Qb.Poco.Global.SyncData;
 
 namespace Qb.Core46Api.Controllers
 {
@@ -112,6 +114,7 @@ namespace Qb.Core46Api.Controllers
         [Authorize(Roles = Roles.EditUserData)]
         public async Task<IActionResult> SetUserData(Poco.User.SyncData syncData)
         {
+            var now = DateTimeOffset.UtcNow;
             var user = await _userManager.GetUserAsync(User);
             var userId = new Guid(user.Id);
             if (syncData.People.Any() && (syncData.People.First().Id != userId))
@@ -135,14 +138,17 @@ namespace Qb.Core46Api.Controllers
                             .Select(d => d.Id).ToListAsync())
                         .Concat(syncData.Devices.Select(d => d.Id));
                     if (!syncData.Sensors.All(s => validDeviceIds.Contains(s.DeviceId)))
-                    {
                         return BadRequest("Can't edit data with non-matching user.");
-                    }
                 }
             }
 
             // The data is valid so save it.
-
+            foreach (var person in syncData.People)
+                person.UpdatedAt = now;
+            SetUpdatedTime(syncData.Locations, now);
+            SetUpdatedTime(syncData.Devices, now);
+            SetUpdatedTime(syncData.CropCycles, now);
+            SetUpdatedTime(syncData.Sensors, now);
             await _db.People.AddOrUpdateRange(syncData.People, (a, b) => a.Id == b.Id);
             await _db.Locations.AddOrUpdateRange(syncData.Locations, (a, b) => a.Id == b.Id);
             await _db.Devices.AddOrUpdateRange(syncData.Devices, (a, b) => a.Id == b.Id);
@@ -152,5 +158,13 @@ namespace Qb.Core46Api.Controllers
 
             return new OkResult();
         }
+
+        private void SetUpdatedTime(IEnumerable<BaseEntity> entities, DateTimeOffset updateTime)
+        {
+            foreach (var entity in entities)
+                entity.UpdatedAt = updateTime;
+        }
+
+
     }
 }
