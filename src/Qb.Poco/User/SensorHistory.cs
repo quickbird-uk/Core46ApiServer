@@ -10,7 +10,7 @@ namespace Qb.Poco.User
         public virtual Location Location { get; set; }
 
         /// <remarks>fk</remarks>
-        public Guid? LocationId { get; set; }
+        public Guid LocationId { get; set; }
 
         /// <summary>Raw data, numbers encoded to 64bit binary.</summary>
         /// <remarks>Don't JsonIgnore this, send it over the iterwebs as base64 (Json.Net deos this by default). Much more
@@ -25,9 +25,7 @@ namespace Qb.Poco.User
         /// <remarks>fk</remarks>
         public Guid SensorId { get; set; }
 
-        /// <summary>
-        /// Use UTC time based date to set the beginning time. This avoids confusion over timezone changes.
-        /// </summary>
+        /// <summary>Use UTC time based date to set the beginning time. This avoids confusion over timezone changes.</summary>
         public DateTime UtcDate { get; set; }
 
         /// <summary>The datetime that this history was uploaded to the server, always set by the server and only by the server.

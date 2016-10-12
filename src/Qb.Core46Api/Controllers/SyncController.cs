@@ -112,9 +112,8 @@ namespace Qb.Core46Api.Controllers
         }
 
         [Authorize(Roles = Roles.EditUserData)]
-        public async Task<IActionResult> SetUserData(Poco.User.SyncData syncData)
+        public async Task<IActionResult> SetUserData([FromBody] Poco.User.SyncData syncData)
         {
-            var now = DateTimeOffset.UtcNow;
             var user = await _userManager.GetUserAsync(User);
             var userId = new Guid(user.Id);
             if (syncData.People.Any() && (syncData.People.First().Id != userId))
@@ -142,13 +141,7 @@ namespace Qb.Core46Api.Controllers
                 }
             }
 
-            // The data is valid so save it.
-            foreach (var person in syncData.People)
-                person.UpdatedAt = now;
-            SetUpdatedTime(syncData.Locations, now);
-            SetUpdatedTime(syncData.Devices, now);
-            SetUpdatedTime(syncData.CropCycles, now);
-            SetUpdatedTime(syncData.Sensors, now);
+            // The updatedAt times are automatically set by savechanges.
             await _db.People.AddOrUpdateRange(syncData.People, (a, b) => a.Id == b.Id);
             await _db.Locations.AddOrUpdateRange(syncData.Locations, (a, b) => a.Id == b.Id);
             await _db.Devices.AddOrUpdateRange(syncData.Devices, (a, b) => a.Id == b.Id);
@@ -159,12 +152,85 @@ namespace Qb.Core46Api.Controllers
             return new OkResult();
         }
 
-        private void SetUpdatedTime(IEnumerable<BaseEntity> entities, DateTimeOffset updateTime)
+        /// <summary>Gets all histories between and including the datetime given.</summary>
+        /// <param name="fromDateTimeUnixSeconds">The earliest time to include datapoints.</param>
+        /// <param name="toUtcDateTimeUnixSeconds">The latest time to include dataopints.</param>
+        /// <returns>All the histories between the specified times.</returns>
+        public async Task<IActionResult> GetUserHistories(long fromDateTimeUnixSeconds, long toUtcDateTimeUnixSeconds)
         {
-            foreach (var entity in entities)
-                entity.UpdatedAt = updateTime;
+            // Filter by the UTC Date (time 00:00:00 (==12:00am)).
+            // All times are converted to the starting time of the day.
+            var fromDateTime = DateTimeOffset.FromUnixTimeSeconds(fromDateTimeUnixSeconds);
+            var fromDate = fromDateTime.Date;
+            var toDateTime = DateTimeOffset.FromUnixTimeSeconds(toUtcDateTimeUnixSeconds);
+            var toDate = toDateTime.Date;
+
+            // Prepare to filter by locations owned by the user.
+            var user = await _userManager.GetUserAsync(User);
+            var userId = new Guid(user.Id);
+            var locationIds = await _db.Locations.Where(l => l.PersonId == userId).Select(l => l.Id).ToListAsync();
+
+            var data =
+                await
+                    _db.SensorHistories.Where(
+                            h => locationIds.Contains(h.LocationId) && (h.UtcDate >= fromDate) && (h.UtcDate <= toDate))
+                        .ToListAsync();
+
+            var needsSlicing = data.Where(h => (h.UtcDate == fromDate) || (h.UtcDate == toDate));
+            foreach (var history in needsSlicing)
+            {
+                var sliced = SensorDatapoint.Slice(history.RawData, fromDateTime, toDateTime);
+                history.RawData = sliced;
+            }
+
+            return new JsonResult(data);
         }
 
 
+        [Authorize(Roles = Roles.EditUserData)]
+        public async Task<IActionResult> SetUserHistories([FromBody] List<SensorHistory> histories)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var userId = new Guid(user.Id);
+            var locationIds = await _db.Locations.Where(l => l.PersonId == userId).Select(l => l.Id).ToListAsync();
+
+            if (histories.Any(h => !locationIds.Contains(h.LocationId)))
+            {
+                var message = "Cant save histories at locations not owned by user.";
+                _logger.LogError(message);
+                return BadRequest(message);
+            }
+
+            // Composite keys aren't easy to turn into a query.
+            var historyIds = histories.Select(h => $"{h.SensorId},{h.UtcDate.Ticks}");
+
+            var existsInDb = await _db.SensorHistories
+                .Where(h => historyIds.Contains($"{h.SensorId},{h.UtcDate.Ticks}"))
+                .ToListAsync();
+
+            var itemsToUpdate = new List<SensorHistory>();
+            foreach (var dbHistory in existsInDb)
+            {
+                // Removed the already existing item from the histories recieved from the API.
+                var recievedHist =
+                    histories.First(h => (h.UtcDate == dbHistory.UtcDate) && (h.SensorId == dbHistory.SensorId));
+                histories.Remove(recievedHist);
+
+                var mergedData = SensorDatapoint.Merge(dbHistory.RawData, recievedHist.RawData);
+
+                // Merge the data in the newly recieved data which should have an updated UploadedAt.
+                recievedHist.RawData = mergedData;
+                if (recievedHist.UploadedAt < DateTimeOffset.Now - TimeSpan.FromMinutes(5))
+                    return BadRequest("UploadedAt time was not set or significant lag has occured.");
+                itemsToUpdate.Add(recievedHist);
+            }
+
+            // The remaining items left in histories must all be new.
+            _db.SensorHistories.AddRange(histories);
+            _db.SensorHistories.UpdateRange(itemsToUpdate);
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

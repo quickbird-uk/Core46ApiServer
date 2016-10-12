@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using OpenIddict;
 using Qb.Poco;
@@ -48,7 +52,7 @@ namespace Qb.Core46Api.Models
             builder.Entity<CropType>().Property(ct => ct.CreatedBy).IsRequired(false);
 
             // Composite key.
-            builder.Entity<SensorHistory>().HasKey(sd => new {sd.SensorId, sd.TimeStamp});
+            builder.Entity<SensorHistory>().HasKey(sd => new {sd.SensorId, sd.UtcDate});
 
             // Set optional foreign key, defaults delete to restrict.
             builder.Entity<Location>().Property(loc => loc.PersonId).IsRequired(false);
@@ -60,6 +64,31 @@ namespace Qb.Core46Api.Models
                 .OnDelete(DeleteBehavior.SetNull);
 
             base.OnModelCreating(builder);
+        }
+
+        public override int SaveChanges()
+        {
+            UpdateUpdateAtOnBaseEntity();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            UpdateUpdateAtOnBaseEntity();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void UpdateUpdateAtOnBaseEntity()
+        {
+            var entities = ChangeTracker.Entries()
+                .Where(
+                    e => e.Entity is BaseEntity && ((e.State == EntityState.Added) || (e.State == EntityState.Modified)));
+            var time = DateTimeOffset.UtcNow;
+            foreach (var entity in entities)
+            {
+                var baseEntity = (BaseEntity) entity.Entity;
+                baseEntity.UpdatedAt = time;
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Qb.Poco.User
 {
@@ -66,6 +67,35 @@ namespace Qb.Poco.User
             Debug.Assert(bytes.Count == size);
 
             return bytes.ToArray();
+        }
+
+        /// <summary>Datapoints in 'b' that match a timestamp in 'a' will be deleted before merge.</summary>
+        /// <param name="a">Serialised datapoints, all of these are kept.</param>
+        /// <param name="b">Serialise datapoints, items with timestamps that exist in 'a' are deleted.</param>
+        /// <returns>The merged data serialised.</returns>
+        public static byte[] Merge(byte[] a, byte[] b)
+        {
+            var aData = Deserialise(a);
+            var bData = Deserialise(b);
+            // Match items via the timestamps.
+            var aTimestamps = aData.Select(d => d.Timestamp);
+            var bDupes = bData.Where(bDatapoint => aTimestamps.Contains(bDatapoint.Timestamp));
+            bData.RemoveAll(bDupes.Contains);
+            // a and b data now contain items with different timestamps so join, serialise and return.
+            aData.AddRange(bData);
+            return Serialise(aData);
+        }
+
+        /// <summary>Extracts the data from start to end inclusive.</summary>
+        /// <param name="data">Data to slice.</param>
+        /// <param name="start">The earliest datetime to include.</param>
+        /// <param name="end">The latest datetime to include.</param>
+        /// <returns>A fresh data object.</returns>
+        public static byte[] Slice(byte[] data, DateTimeOffset start, DateTimeOffset end)
+        {
+            var datapoints = Deserialise(data);
+            var valid = datapoints.Where(d => (d.Timestamp >= start) && (d.Timestamp <= end)).ToList();
+            return Serialise(valid);
         }
     }
 }
