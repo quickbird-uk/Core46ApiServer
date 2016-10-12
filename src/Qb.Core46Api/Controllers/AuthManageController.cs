@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Qb.Core46Api.Helpers;
 using Qb.Core46Api.Models;
+using Qb.Core46Api.Vars;
 
 namespace Qb.Core46Api.Controllers
 {
@@ -31,12 +32,12 @@ namespace Qb.Core46Api.Controllers
         }
 
         /// <summary>Admin is the god role, never give to users.</summary>
-        [Authorize(Roles = Vars.Roles.Admin)]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost("[action]")]
         public async Task<IActionResult> GrantAdminRole(string username)
         {
             var user = await _userManager.FindByNameAsync(username);
-            var result = await _userManager.AddToRoleAsync(user, Vars.Roles.Admin);
+            var result = await _userManager.AddToRoleAsync(user, Roles.Admin);
             if (result.Succeeded)
                 return Res.PlainUtf8($"Admin role granted to {username}.");
 
@@ -45,7 +46,7 @@ namespace Qb.Core46Api.Controllers
         }
 
         /// <summary>Sets phone number for a user skipping text authorization.</summary>
-        [Authorize(Roles = Vars.Roles.Admin)]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost("[action]")]
         public async Task<IActionResult> SetPhonenumberAndConfirm(string username, string phonenumber)
         {
@@ -62,8 +63,6 @@ namespace Qb.Core46Api.Controllers
         }
 
 
-
-
         /// <summary>Test authorization for any user (404 on fail).</summary>
         [Authorize]
         [HttpGet("[action]")]
@@ -74,7 +73,7 @@ namespace Qb.Core46Api.Controllers
 
         /// <summary>Test if admin role authorization is granted (404 on fail).</summary>
         /// <returns></returns>
-        [Authorize(Roles = Vars.Roles.Admin)]
+        [Authorize(Roles = Roles.Admin)]
         [HttpGet("[action]")]
         public IActionResult AmIAuthorizedAdmin()
         {
@@ -102,7 +101,7 @@ namespace Qb.Core46Api.Controllers
             return Res.PlainUtf8(phoneToken);
         }
 
-        [Authorize(Roles = Vars.Roles.Admin)]
+        [Authorize(Roles = Roles.Admin)]
         [HttpPost("[action]")]
         public async Task<IActionResult> DeleteUser(string username)
         {

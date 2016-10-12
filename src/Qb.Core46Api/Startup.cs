@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Qb.Core46Api.Models;
 using Qb.Core46Api.Services;
+using Qb.Core46Api.Vars;
 
 namespace Qb.Core46Api
 {
@@ -137,14 +138,14 @@ namespace Qb.Core46Api
             // Don't db.Database.Migrate here, slows server start time, do it on publish instead.
 
             var roleMan = scope.ServiceProvider.GetService<RoleManager<IdentityRole>>();
-            if (!roleMan.Roles.Any(r => r.Name == Vars.Roles.Admin))
-                await roleMan.CreateAsync(new IdentityRole(Vars.Roles.Admin));
+            if (!roleMan.Roles.Any(r => r.Name == Roles.Admin))
+                await roleMan.CreateAsync(new IdentityRole(Roles.Admin));
 
-            if (!roleMan.Roles.Any(r => r.Name == Vars.Roles.EditGlobalData))
-                await roleMan.CreateAsync(new IdentityRole(Vars.Roles.EditGlobalData));
+            if (!roleMan.Roles.Any(r => r.Name == Roles.EditGlobalData))
+                await roleMan.CreateAsync(new IdentityRole(Roles.EditGlobalData));
 
-            if (!roleMan.Roles.Any(r => r.Name == Vars.Roles.EditUserData))
-                await roleMan.CreateAsync(new IdentityRole(Vars.Roles.EditUserData));
+            if (!roleMan.Roles.Any(r => r.Name == Roles.EditUserData))
+                await roleMan.CreateAsync(new IdentityRole(Roles.EditUserData));
 
             var userManager = scope.ServiceProvider.GetService<UserManager<QbUser>>();
             if (await userManager.FindByNameAsync("admin") == null)
@@ -152,7 +153,7 @@ namespace Qb.Core46Api
                 var adminUser = new QbUser {UserName = "admin", PhoneNumberConfirmed = true};
                 await userManager.CreateAsync(adminUser, "xxxxxxxx");
                 adminUser = await userManager.FindByNameAsync("admin");
-                await userManager.AddToRoleAsync(adminUser, Vars.Roles.Admin);
+                await userManager.AddToRoleAsync(adminUser, Roles.Admin);
             }
         }
     }
