@@ -243,3 +243,6 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+
+# MySql Workbench backups
+design/*.mwb.bak*
