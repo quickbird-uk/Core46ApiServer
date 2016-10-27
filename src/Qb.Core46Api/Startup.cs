@@ -103,6 +103,7 @@ namespace Qb.Core46Api
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            app.UseWebSockets();
             app.UseMvc();
 
             app.UseSwagger();
