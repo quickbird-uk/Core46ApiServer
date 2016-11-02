@@ -20,6 +20,14 @@ namespace Qb.Core46Api.Controllers
             _userManager = userManager;
         }
 
+        [Authorize]
+        [HttpGet("[action]")]
+        public async Task<IActionResult> WhoAmI()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            return Res.PlainUtf8(user.Id);
+        }
+
         /// <summary>Gets calims from current authorization (property of the token/signin, not a property of the the user).</summary>
         /// <returns>List of | separated calims.</returns>
         [Authorize]
