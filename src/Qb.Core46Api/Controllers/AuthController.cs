@@ -40,35 +40,19 @@ namespace Qb.Core46Api.Controllers
             {
                 var user = await _userManager.FindByNameAsync(request.Username);
                 if (user == null)
-                    return BadRequest(new OpenIdConnectResponse
-                    {
-                        Error = OpenIdConnectConstants.Errors.InvalidGrant,
-                        ErrorDescription = "The username/password couple is invalid."
-                    });
+                    return Res.JsonErrorResult("invalid", 401);
 
-                // Ensure the user is allowed to sign in.
+                // Chack that email or phone verification is done if required.
                 if (!await _signInManager.CanSignInAsync(user))
-                    return BadRequest(new OpenIdConnectResponse
-                    {
-                        Error = OpenIdConnectConstants.Errors.InvalidGrant,
-                        ErrorDescription = "The specified user is not allowed to sign in."
-                    });
+                    return Res.JsonErrorResult("needs_confirm", 401); // Actual response is 302 redirect.
 
                 // Reject the token request if two-factor authentication has been enabled by the user.
                 if (_userManager.SupportsUserTwoFactor && await _userManager.GetTwoFactorEnabledAsync(user))
-                    return BadRequest(new OpenIdConnectResponse
-                    {
-                        Error = OpenIdConnectConstants.Errors.InvalidGrant,
-                        ErrorDescription = "The specified user is not allowed to sign in."
-                    });
+                    return Res.JsonErrorResult("2fa", 401);
 
-                // Ensure the user is not already locked out.
+                // Lockout response must be the same as invalid credentials to foil brute force attacks.
                 if (_userManager.SupportsUserLockout && await _userManager.IsLockedOutAsync(user))
-                    return BadRequest(new OpenIdConnectResponse
-                    {
-                        Error = OpenIdConnectConstants.Errors.InvalidGrant,
-                        ErrorDescription = "The username/password couple is invalid."
-                    });
+                    return Res.JsonErrorResult("invalid", 401);
 
                 // Ensure the password is valid.
                 if (!await _userManager.CheckPasswordAsync(user, request.Password))
@@ -76,11 +60,7 @@ namespace Qb.Core46Api.Controllers
                     if (_userManager.SupportsUserLockout)
                         await _userManager.AccessFailedAsync(user);
 
-                    return BadRequest(new OpenIdConnectResponse
-                    {
-                        Error = OpenIdConnectConstants.Errors.InvalidGrant,
-                        ErrorDescription = "The username/password couple is invalid."
-                    });
+                    return Res.JsonErrorResult("invalid", 401);
                 }
 
                 if (_userManager.SupportsUserLockout)
