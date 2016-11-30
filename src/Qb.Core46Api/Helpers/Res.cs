@@ -22,13 +22,18 @@ namespace Qb.Core46Api.Helpers
         /// <summary>Sends {"error": errorMessage} with application/json and status 400 explicitly set.</summary>
         /// <param name="errorMessage">The message to put in the json.</param>
         /// <param name="statusCode">Status code.</param>
+        /// <param name="description">A longer error description if the message is just an error code.</param>
         /// <returns>A Json ContentResult.</returns>
-        public static ContentResult JsonErrorResult(string errorMessage, int statusCode)
+        public static ContentResult JsonErrorResult(string errorMessage, int statusCode, string description = null)
         {
+            //Interpolated verbatim strings escape ", { and } by doubling them.
+            var content = description == null
+                ? $@"{{""error"" : ""{errorMessage}""}}"
+                : $@"{{""error"" : ""{errorMessage}"",""description"": ""{description}""}}";
             var cr = new ContentResult
             {
                 StatusCode = statusCode,
-                Content = "{\"error\" : \"" + errorMessage + "\"}",
+                Content = content,
                 ContentType = "application/json"
             };
             return cr;

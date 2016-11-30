@@ -95,8 +95,13 @@ namespace Qb.Core46Api.Controllers
         {
             var pars = new[] {username, password, phonenumber};
             if (pars.Any(string.IsNullOrWhiteSpace))
-                return Res.PlainUtf8(
-                    "One or more of required fields missing or empty: username, password, phonenumber", 400);
+                return Res.JsonErrorResult( "missing_field", 400,
+                    "One or more of required fields missing or empty: username, password, phonenumber.");
+
+            var exists = null != await _userManager.FindByNameAsync(username);
+
+            if (exists)
+                return Res.JsonErrorResult("exists", 400, "Username already exists.");
 
             var user = new QbUser
             {
@@ -121,13 +126,13 @@ namespace Qb.Core46Api.Controllers
                 if (phonenumber.ToLowerInvariant() != "ignore")
                     if (!await smsSender.SendSms($"QB sign-up code:{phoneToken}", phonenumber))
                         return
-                            Res.PlainUtf8(
-                                "User created but sms failed, try re-requesting code by changing phonenumber.", 400);
+                            Res.JsonErrorResult("invalid_phone", 400,
+                                "User created but sms failed, try re-requesting code by changing phonenumber.");
 
                 return Res.PlainUtf8($"User {username} successfully created, needs verification.");
             }
 
-            return Res.PlainUtf8(res.PrettyErrors(), 400);
+            return Res.JsonErrorResult("identity_error", 400, res.PrettyErrors());
         }
 
         /// <summary>Creates a Person in the DB. The Person object has no knowledge of ASP.Net Identity. The Person's Guid will be
